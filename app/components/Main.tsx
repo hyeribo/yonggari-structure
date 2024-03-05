@@ -36,9 +36,12 @@ const Main: React.FC = () => {
 
       setIsLoading(true);
       const params = { sigunguCd, bjdongCd };
-      const res = await axios.get(`http://localhost:3001/api/structures`, {
-        params,
-      });
+      const res = await axios.get(
+        `https://yonggari-structure.vercel.app/api/structures`,
+        {
+          params,
+        }
+      );
       const { pages, totalCount, search } = res.data.data as StructureTotalPage;
       const totalPageItems: Structure[][] =
         pages?.map?.((page) => page.items) ?? [];
