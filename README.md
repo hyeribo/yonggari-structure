@@ -34,3 +34,8 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## 전국 법정동 코드 파일 최신으로 업데이트하기
+
+1. [이곳](https://www.code.go.kr/stdcodesrch/codeAllDownloadL.do)에서 [국토교통부_전국 법정동_날짜] 엑셀 파일 다운로드 후 [codes.xlsx] 으로 파일명 변경
+2. public 폴더에 파일 추가
