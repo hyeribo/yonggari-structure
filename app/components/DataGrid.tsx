@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ColDef } from "ag-grid-community";
+import { ColDef, GridOptions } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react"; // AG Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 // import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
@@ -10,10 +10,24 @@ import { Structure } from "../interfaces";
 
 type DataGridProps = {
   data: Structure[];
+  onChangeRowCount?: (count: number) => void;
 };
 
-const DataGrid: React.FC<DataGridProps> = ({ data }) => {
-  const colDefs = useMemo<ColDef[]>(
+const DataGrid: React.FC<DataGridProps> = ({ data, onChangeRowCount }) => {
+  const gripdOptions = useMemo<GridOptions>(
+    () => ({
+      defaultColDef: {
+        filter: "agTextColumnFilter",
+      },
+      onPaginationChanged: (params) => {
+        const count = params.api.getDisplayedRowCount();
+        onChangeRowCount?.(count);
+      },
+    }),
+    [onChangeRowCount]
+  );
+
+  const columnDefs = useMemo<ColDef[]>(
     () => [
       { field: "mainPurpsCdNm", headerName: "주용도코드명" },
       { field: "bldNm", headerName: "건물명" },
@@ -31,10 +45,13 @@ const DataGrid: React.FC<DataGridProps> = ({ data }) => {
     ],
     []
   );
-
   return (
     <div className="ag-theme-balham" style={{ height: "100%" }}>
-      <AgGridReact columnDefs={colDefs} rowData={data} />
+      <AgGridReact
+        rowData={data}
+        columnDefs={columnDefs}
+        gridOptions={gripdOptions}
+      />
     </div>
   );
 };

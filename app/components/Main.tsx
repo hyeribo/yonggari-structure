@@ -1,8 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
-import { Button, Input, Space } from "antd";
-import { FileExcelOutlined } from "@ant-design/icons";
-import Link from "next/link";
+import { Button, Input, Space, Dropdown, FloatButton } from "antd";
+import {
+  FileExcelOutlined,
+  MoreOutlined,
+  LockOutlined,
+  EyeInvisibleOutlined,
+} from "@ant-design/icons";
 
 import DataGrid from "./DataGrid";
 
@@ -13,14 +17,20 @@ import {
 } from "../interfaces";
 import { downloadExcel } from "../lib/excel";
 
-const Main: React.FC = () => {
+type MainProps = {
+  onLock: () => void;
+};
+
+const Main: React.FC<MainProps> = ({ onLock }) => {
   const [sigunguCd, setSigunguCd] = useState("");
   const [bjdongCd, setBjdongCd] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<Structure[]>([]);
+  const [dataCount, setDataCount] = useState<number>(0);
   const [prevSearchParams, setPrevSearchParams] =
     useState<StructureSearchParams>({ sigunguCd: "", bjdongCd: "" });
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isVisibleFloatButton, setIsVisibleFloatButton] = useState(true);
 
   const handleSearch = async () => {
     try {
@@ -36,12 +46,9 @@ const Main: React.FC = () => {
 
       setIsLoading(true);
       const params = { sigunguCd, bjdongCd };
-      const res = await axios.get(
-        `https://yonggari-structure.vercel.app/api/structures`,
-        {
-          params,
-        }
-      );
+      const res = await axios.get(`http://localhost:3001/api/structures`, {
+        params,
+      });
       const { pages, totalCount, search } = res.data.data as StructureTotalPage;
       const totalPageItems: Structure[][] =
         pages?.map?.((page) => page.items) ?? [];
@@ -67,15 +74,17 @@ const Main: React.FC = () => {
     }
   };
 
+  const handleDownloadCodes = () => {
+    window.open("/xlsx/codes.xlsx");
+  };
+
+  const handleHideFloatButton = () => {
+    setIsVisibleFloatButton(false);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="absolute top-1 right-1">
-        <Link href="/xlsx/codes.xlsx" target="_blank">
-          <Button size="small">코드</Button>
-        </Link>
-      </div>
-
-      <div className="flex flex-row justify-center items-center h-[60px] gap-1 px-3">
+      <div className="flex flex-row justify-center items-center h-[60px] gap-1 px-10">
         <Space.Compact>
           <Input
             addonBefore="시군구코드"
@@ -99,7 +108,10 @@ const Main: React.FC = () => {
         </Button>
       </div>
 
-      <div className="flex flex-row justify-end items-end h-[60px] gap-1 px-3 mb-2">
+      <div className="flex flex-row justify-between items-end h-[60px] gap-1 pl-5 pr-3 mb-2">
+        <span className="text-sm">
+          총 <span className="text-blue-400">{dataCount}</span>개
+        </span>
         <Button
           onClick={handleDownload}
           icon={<FileExcelOutlined />}
@@ -110,8 +122,24 @@ const Main: React.FC = () => {
         </Button>
       </div>
       <div className="px-3" style={{ height: "calc(100vh - 140px)" }}>
-        <DataGrid data={data} />
+        <DataGrid data={data} onChangeRowCount={setDataCount} />
       </div>
+
+      {isVisibleFloatButton && (
+        <FloatButton.Group
+          trigger="click"
+          type="primary"
+          style={{ right: 25, bottom: 25 }}
+          icon={<MoreOutlined />}
+        >
+          <FloatButton onClick={handleDownloadCodes} />
+          <FloatButton icon={<LockOutlined />} onClick={onLock} />
+          <FloatButton
+            icon={<EyeInvisibleOutlined />}
+            onClick={handleHideFloatButton}
+          />
+        </FloatButton.Group>
+      )}
     </div>
   );
 };

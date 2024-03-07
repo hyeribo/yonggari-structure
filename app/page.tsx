@@ -6,15 +6,23 @@ import Guard from "@/app/components/Guard";
 import Main from "@/app/components/Main";
 
 export default function Home() {
-  const [authorized, setAuthorized] = useState(false);
+  const [authorized, setAuthorized] = useState(true);
 
-  const onPass = () => {
+  const handlePass = () => {
     setAuthorized(true);
+  };
+
+  const handleLock = () => {
+    setAuthorized(false);
   };
 
   return (
     <main className="min-h-screen min-w-full">
-      {authorized ? <Main /> : <Guard onPass={onPass} />}
+      {authorized ? (
+        <Main onLock={handleLock} />
+      ) : (
+        <Guard onPass={handlePass} />
+      )}
     </main>
   );
 }
